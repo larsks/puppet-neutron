@@ -17,6 +17,19 @@ class { 'neutron::server':
   connection        => 'mysql://neutron:password@192.168.1.1/neutron',
 }
 
+# Configure nova notifications system
+class { 'neutron::server::notifications':
+  nova_admin_tenant_name => 'admin',
+  nova_admin_password    => 'secrete'
+}
+
+# This class is required when neutron::server::notifications is used
+class {'keystone::roles::admin':
+  admin_tenant => 'admin',
+  email        => 'admin@openstack.org',
+  password     => 'secrete'
+}
+
 # Various agents
 class { 'neutron::agents::dhcp': }
 class { 'neutron::agents::l3': }
