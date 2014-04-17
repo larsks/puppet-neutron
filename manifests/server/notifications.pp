@@ -74,6 +74,7 @@ class neutron::server::notifications (
   $nova_region_name                   = 'RegionOne',
   $keystone_username                  = 'admin',
   $keystone_password                  = undef,
+  $keystone_tenant_name               = 'admin',
 ) {
 
   if ! $nova_admin_password {
@@ -91,6 +92,7 @@ class neutron::server::notifications (
       "$nova_admin_auth_url/tokens",
       $keystone_username,
       $keystone_password,
+      $keystone_tenant_name,
       $nova_admin_tenant_name)
   }
 
