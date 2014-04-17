@@ -69,12 +69,33 @@ class neutron::server::notifications (
   $nova_admin_auth_url                = 'http://localhost:5000/v2.0',
   $nova_admin_username                = 'nova',
   $nova_admin_tenant_name             = 'nova',
+  $nova_admin_tenant_id               = undef,
   $nova_admin_password                = false,
   $nova_region_name                   = 'RegionOne',
+  $keystone_username                  = 'admin',
+  $keystone_password                  = undef,
 ) {
 
   if ! $nova_admin_password {
     fail('nova_admin_password must be set.')
+  }
+
+  if ! ( $nova_admin_tenant_id or $nova_admin_tenant_name ) {
+    fail('You must provide either nova_admin_tenant_name or nova_admin_tenant_id.')
+  }
+
+  if $nova_admin_tenant_id {
+    $real_nova_admin_tenant_id = $nova_admin_tenant_id
+  } elsif $nova_admin_tenant_name {
+    $real_nova_admin_tenant_id = keystone_tenant_by_name(
+      "$nova_admin_auth_url/tokens",
+      $keystone_username,
+      $keystone_password,
+      $nova_admin_tenant_name)
+  }
+
+  if ! $real_nova_admin_tenant_id {
+    fail('Unable to determine value for nova_admin_tenant_id.')
   }
 
   neutron_config {
@@ -86,10 +107,6 @@ class neutron::server::notifications (
     'DEFAULT/nova_admin_username':                value => $nova_admin_username;
     'DEFAULT/nova_admin_password':                value => $nova_admin_password;
     'DEFAULT/nova_region_name':                   value => $nova_region_name;
-  }
-
-  nova_admin_tenant_id_setter {'nova_admin_tenant_id':
-    ensure      => present,
-    tenant_name => $nova_admin_tenant_name
+    'DEFAULT/nova_admin_tenant_id'                value => $real_nova_admin_tenant_id;
   }
 }
