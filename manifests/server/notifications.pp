@@ -107,6 +107,6 @@ class neutron::server::notifications (
     'DEFAULT/nova_admin_username':                value => $nova_admin_username;
     'DEFAULT/nova_admin_password':                value => $nova_admin_password;
     'DEFAULT/nova_region_name':                   value => $nova_region_name;
-    'DEFAULT/nova_admin_tenant_id'                value => $real_nova_admin_tenant_id;
+    'DEFAULT/nova_admin_tenant_id':               value => $real_nova_admin_tenant_id;
   }
 }
