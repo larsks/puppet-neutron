@@ -15,4 +15,5 @@ Puppet::Type.newtype(:neutron_config) do
       value
     end
   end
+
 end
