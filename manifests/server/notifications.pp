@@ -72,9 +72,10 @@ class neutron::server::notifications (
   $nova_admin_tenant_id               = undef,
   $nova_admin_password                = false,
   $nova_region_name                   = 'RegionOne',
-  $keystone_username                  = 'admin',
-  $keystone_password                  = undef,
-  $keystone_tenant_name               = 'admin',
+  $keystone_admin_url                 = 'http://127.0.0.1:35357/v2.0',
+  $keystone_admin_username            = 'admin',
+  $keystone_admin_password            = undef,
+  $keystone_admin_tenant_name         = 'admin',
 ) {
 
   if ! $nova_admin_password {
@@ -89,10 +90,10 @@ class neutron::server::notifications (
     $real_nova_admin_tenant_id = $nova_admin_tenant_id
   } elsif $nova_admin_tenant_name {
     $real_nova_admin_tenant_id = keystone_tenant_by_name(
-      "$nova_admin_auth_url/tokens",
-      $keystone_username,
-      $keystone_password,
-      $keystone_tenant_name,
+      $keystone_admin_url,
+      $keystone_admin_username,
+      $keystone_admin_password,
+      $keystone_admin_tenant_name,
       $nova_admin_tenant_name)
   }
 

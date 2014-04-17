@@ -1,3 +1,5 @@
+## NB: This must work with Ruby 1.8!
+
 require 'rubygems'
 require 'net/http'
 require 'json'
@@ -24,14 +26,22 @@ def keystone_v2_authenticate(auth_url,
         post_args['auth']['tenantName'] = tenantName
     end
 
-    url = URI.parse("#{auth_url}/tokens")
-    req = Net::HTTP::Post.new url
-    req['content-type'] = 'application/json'
-    req.body = post_args.to_json
+        url = URI.parse("#{auth_url}/tokens")
+        req = Net::HTTP::Post.new url.path
+        req['content-type'] = 'application/json'
+        req.body = post_args.to_json
 
-    res = Net::HTTP.start(url.hostname, url.port) {|http|
-        http.request(req)
-    }
+    begin
+        res = Net::HTTP.start(url.host, url.port) {|http|
+            http.request(req)
+        }
+        
+        if res.code != '200'
+            raise Puppet::Error, "Failed to authenticate to Keystone server at #{auth_url} as user #{username}."
+        end
+    rescue Errno::ECONNREFUSED
+        raise Puppet::Error, "Failed to connect to Keystone server at #{auth_url}."
+    end
 
     data = JSON.parse res.body
     return data['access']['token']['id'], data
@@ -41,13 +51,21 @@ def keystone_v2_tenants(auth_url,
                         token)
 
     url = URI.parse("#{auth_url}/tenants")
-    req = Net::HTTP::Get.new url
+    req = Net::HTTP::Get.new url.path
     req['content-type'] = 'application/json'
     req['x-auth-token'] = token
 
-    res = Net::HTTP.start(url.hostname, url.port) {|http|
-        http.request(req)
-    }
+    begin
+        res = Net::HTTP.start(url.host, url.port) {|http|
+            http.request(req)
+        }
+
+        if res.code != '200'
+            raise Puppet::Error, "Failed to request list of tenants from Keystone server at #{auth_url}."
+        end
+    rescue Errno::ECONNREFUSED
+        raise Puppet::Error, "Failed to connect to Keystone server at #{auth_url}."
+    end
 
     data = JSON.parse res.body
     data['tenants']
