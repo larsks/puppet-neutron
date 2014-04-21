@@ -13,17 +13,6 @@ describe 'neutron::server::notifications' do
         }
     end
 
-    context 'when admin_id is specified' do
-        let :params do
-            default_params.merge({
-                :nova_admin_auth_url => 'http://badserver:35357/v2.0',
-                :nova_admin_tenant_id => 'ADMIN-ID',
-            })
-        end
-
-        it { should_not contain_notify('lookup') }
-    end
-
     # This should call the custom provider, but even though an appropriate
     # resource types seems to exist the provider is never being called.
     context 'when admin_id is not specified' do
