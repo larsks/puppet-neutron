@@ -94,6 +94,11 @@ class neutron::server::notifications (
       'DEFAULT/nova_admin_tenant_id': value => $nova_admin_tenant_id;
     }
   } else {
+    # This is here temporarily as a flag for the spec tests.
+    notify {'lookup':
+      message => "looking up tenant id in keystone",
+    }
+
     nova_admin_tenant_id_setter {'nova_admin_tenant_id':
       ensure           => present,
       tenant_name      => $nova_admin_tenant_name,
