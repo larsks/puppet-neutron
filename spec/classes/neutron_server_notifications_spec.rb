@@ -100,11 +100,21 @@ describe 'neutron::server::notifications' do
       end
     end
 
-    context 'when broken nova authentification' do
+    context 'when no nova password is specified' do
       before :each do
         params.merge!(
           :nova_admin_password => false
         )
+      end
+      it 'should fails to configure neutron server' do
+          expect { subject }.to raise_error(Puppet::Error, /nova_admin_password must be set./)
+      end
+    end
+
+    context 'when wrong nova password is specified' do
+      before :each do
+        stub_request(:post, "http://keystone:35357/v2.0/tokens").
+            to_return(:status => 401, :body => "", :headers => {})
       end
       it 'should fails to configure neutron server' do
           expect { subject }.to raise_error(Puppet::Error, /nova_admin_password must be set./)
