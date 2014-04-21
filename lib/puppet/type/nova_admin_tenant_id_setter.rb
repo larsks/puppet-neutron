@@ -11,7 +11,7 @@ Puppet::Type.newtype(:nova_admin_tenant_id_setter) do
     end
 
     newparam(:auth_url) do
-        defaulto 'http://localhost:35357/v2.0'
+        defaultto 'http://localhost:35357/v2.0'
     end
 
     newparam(:auth_username) do
