@@ -68,10 +68,6 @@ class neutron::server::notifications (
   $nova_region_name                   = 'RegionOne',
 ) {
 
-  # If Nova is being deployed along with Neutron, we need to ensure
-  # that Keystone principals are created before running this module.
-  Keystone_user <| title == $nova_admin_username |> -> Class['neutron::server::notifications']
-
   if ! $nova_admin_password {
     fail('nova_admin_password must be set.')
   }

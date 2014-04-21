@@ -16,4 +16,8 @@ Puppet::Type.newtype(:neutron_config) do
     end
   end
 
+  def create
+      provider.create
+  end
+
 end

@@ -37,6 +37,10 @@ def keystone_v2_authenticate(auth_url,
                              tenantId=nil,
                              tenantName=nil)
 
+File.open('/tmp/debug', 'w') do |f2|  
+  f2.puts "auth to #{auth_url} as #{username}:#{password}"
+end  
+
     post_args = {
         'auth' => {
             'passwordCredentials' => {
@@ -129,16 +133,7 @@ Puppet::Type.type(:nova_admin_tenant_id_setter).provide(:ruby) do
     end
 
     def exists?
-        token = authenticate
-        tenants = find_tenant_by_name(token)
-
-        if tenants.length == 1
-            return true
-        elsif tenants.length > 1
-            raise KeystoneError, 'Found multiple matches for tenant name'
-        else
-            return false
-        end
+        false
     end
 
     def create
