@@ -80,21 +80,6 @@ class neutron::server::notifications (
     fail('You must provide either nova_admin_tenant_name or nova_admin_tenant_id.')
   }
 
-  if $nova_admin_tenant_id {
-    $real_nova_admin_tenant_id = $nova_admin_tenant_id
-  } elsif $nova_admin_tenant_name {
-    $real_nova_admin_tenant_id = keystone_tenant_by_name(
-      $nova_admin_auth_url,
-      $nova_admin_username,
-      $nova_admin_password,
-      $nova_admin_tenant_name,
-      $nova_admin_tenant_name)
-  }
-
-  if ! $real_nova_admin_tenant_id {
-    fail('Unable to determine value for nova_admin_tenant_id.')
-  }
-
   neutron_config {
     'DEFAULT/notify_nova_on_port_status_changes': value => $notify_nova_on_port_status_changes;
     'DEFAULT/notify_nova_on_port_data_changes':   value => $notify_nova_on_port_data_changes;
@@ -104,6 +89,20 @@ class neutron::server::notifications (
     'DEFAULT/nova_admin_username':                value => $nova_admin_username;
     'DEFAULT/nova_admin_password':                value => $nova_admin_password;
     'DEFAULT/nova_region_name':                   value => $nova_region_name;
-    'DEFAULT/nova_admin_tenant_id':               value => $real_nova_admin_tenant_id;
+  }
+
+  if $nova_admin_tenant_id {
+    neutron_config {
+      'DEFAULT/nova_admin_tenant_id': value => $nova_admin_tenant_id;
+    }
+  } else {
+    nova_admin_tenant_id_setter {'nova_admin_tenant_id':
+      ensure           => present,
+      tenant_name      => $nova_admin_tenant_name,
+      auth_url         => $nova_admin_auth_url,
+      auth_username    => $nova_admin_username,
+      auth_password    => $nova_admin_password,
+      auth_tenant_name => $nova_admin_tenant_name,
+    }
   }
 }
