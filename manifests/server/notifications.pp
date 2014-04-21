@@ -99,6 +99,7 @@ class neutron::server::notifications (
       auth_username    => $nova_admin_username,
       auth_password    => $nova_admin_password,
       auth_tenant_name => $nova_admin_tenant_name,
+      require          => Keystone_user[$nova_admin_username],
     }
   }
 }

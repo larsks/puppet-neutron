@@ -37,10 +37,6 @@ def keystone_v2_authenticate(auth_url,
                              tenantId=nil,
                              tenantName=nil)
 
-File.open('/tmp/debug', 'w') do |f2|  
-  f2.puts "auth to #{auth_url} as #{username}:#{password}"
-end  
-
     post_args = {
         'auth' => {
             'passwordCredentials' => {
